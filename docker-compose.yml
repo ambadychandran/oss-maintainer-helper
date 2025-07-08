@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./apps/frontend
+    ports:
+      - "3000:3000"
+    env_file: .env
+
+  gateway:
+    build: ./apps/gateway
+    ports:
+      - "4000:4000"
+    env_file: .env
+
+  agent-backend:
+    build: ./apps/agent-backend
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./apps/agent-backend:/app
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: ossdb
+    ports:
+      - "5432:5432"
+
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8000:8000"
+
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"

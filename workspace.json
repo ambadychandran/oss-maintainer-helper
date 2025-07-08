@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "projects": {
+    "frontend": {
+      "root": "apps/frontend",
+      "projectType": "application",
+      "targets": {
+        "dev": {
+          "executor": "@nx/next:dev-server",
+          "options": {
+            "port": 3000
+          }
+        }
+      }
+    },
+    "gateway": {
+      "root": "apps/gateway",
+      "projectType": "application",
+      "targets": {
+        "serve": {
+          "executor": "@nx/express:dev-server",
+          "options": {
+            "buildTarget": "gateway:build"
+          }
+        }
+      }
+    },
+    "agent-backend": {
+      "root": "apps/agent-backend",
+      "projectType": "application",
+      "targets": {
+        "serve": {
+          "executor": "@nx/workspace:run-commands",
+          "options": {
+            "command": "uvicorn main:app --reload --port 8001",
+            "cwd": "apps/agent-backend"
+          }
+        }
+      }
+    }
+  }
+}

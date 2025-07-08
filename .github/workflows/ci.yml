@@ -1,0 +1,21 @@
+name: OSS Maintainer CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
+      - name: Install dependencies
+        run: pnpm install
+      - name: Lint & Test
+        run: |
+          npx nx lint frontend
+          npx nx lint gateway

@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+langgraph
+langchain
+chromadb
+openai
+redis
+httpx
+pydantic
