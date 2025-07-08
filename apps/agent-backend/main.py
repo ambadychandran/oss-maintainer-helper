@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from github_retriever import GitHubRetriever
+import os
 
 from langgraph.graph import END, StateGraph
 
@@ -8,18 +10,30 @@ from typing import TypedDict
 
 class Query(BaseModel):
     question: str
+    repo: str
 
 
 class GraphState(TypedDict, total=False):
     question: str
+    repo: str
     steps: list[str]
     answer: str
+    retrieved_content: str
 
 
 def retriever_node(state: GraphState) -> GraphState:
-    print("retrieving...")
+    question = state.get("question")
+    repo = state.get("repo")
+    if not question or not repo:
+        raise ValueError("Question and repo are required")
+
+    token = os.getenv("GITHUB_TOKEN")
+    redis_url = os.getenv("REDIS_URL")
+    retriever = GitHubRetriever(token=token, redis_url=redis_url)
+    readme = retriever.get_readme(repo)
+
     steps = state.get("steps", []) + ["retrieving"]
-    return {"steps": steps}
+    return {"steps": steps, "retrieved_content": readme}
 
 
 def planner_node(state: GraphState) -> GraphState:
@@ -71,9 +85,13 @@ compiled_graph = build_graph()
 
 @app.post("/query")
 async def query_endpoint(payload: Query):
-    if not payload.question:
-        raise HTTPException(status_code=400, detail="Question required")
-    state: GraphState = {"question": payload.question, "steps": []}
+    if not payload.question or not payload.repo:
+        raise HTTPException(status_code=400, detail="Question and repo required")
+    state: GraphState = {
+        "question": payload.question,
+        "repo": payload.repo,
+        "steps": [],
+    }
     result = compiled_graph.invoke(state)
     return {"answer": result.get("answer"), "steps": result.get("steps", [])}
 
