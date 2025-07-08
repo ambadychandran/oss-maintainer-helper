@@ -21,12 +21,15 @@ services:
       - "4000:4000"
     env_file: .env
 
-  agent-backend:
-    build: ./apps/agent-backend
+  agent:
+    image: node:20
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: sh -c "corepack enable && pnpm install && PORT=8001 pnpm nx run agent:serve"
     ports:
       - "8001:8001"
-    volumes:
-      - ./apps/agent-backend:/app
+    env_file: .env
 
   redis:
     image: redis:7

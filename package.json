@@ -56,8 +56,11 @@
     "packages/*"
   ],
   "dependencies": {
+    "@langchain/community": "^0.3.48",
+    "@langchain/langgraph": "^0.3.6",
     "axios": "^1.6.0",
     "express": "^4.21.2",
+    "langchain": "^0.3.29",
     "next": "~15.2.4",
     "react": "19.0.0",
     "react-dom": "19.0.0"

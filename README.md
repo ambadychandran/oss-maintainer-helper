@@ -7,7 +7,7 @@ A fully open-source, agentic RAG app to explore and query GitHub projects using 
 - **Monorepo:** Nx (with pnpm)
 - **Frontend:** Next.js + Radix UI + shadcn/ui
 - **API Gateway:** Express.js (Node)
-- **Agent Backend:** FastAPI + LangGraph + LangChain (Python)
+- **Agent Backend:** LangGraph.js + LangChain.js (Node, Nx app `apps/agent`)
 - **Vector DB:** Chroma
 - **Database:** PostgreSQL
 - **LLMs:** Ollama (local) or OpenAI-compatible APIs
