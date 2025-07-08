@@ -1,0 +1,34 @@
+{
+  "name": "@oss-maintainer-helper/agent",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@oss-maintainer-helper/agent:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@oss-maintainer-helper/agent:build:development"
+          },
+          "production": {
+            "buildTarget": "@oss-maintainer-helper/agent:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  }
+}

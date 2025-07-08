@@ -25,15 +25,14 @@
         }
       }
     },
-    "agent-backend": {
-      "root": "apps/agent-backend",
+    "agent": {
+      "root": "apps/agent",
       "projectType": "application",
       "targets": {
         "serve": {
-          "executor": "@nx/workspace:run-commands",
+          "executor": "@nx/express:dev-server",
           "options": {
-            "command": "uvicorn main:app --reload --port 8001",
-            "cwd": "apps/agent-backend"
+            "buildTarget": "agent:build"
           }
         }
       }
