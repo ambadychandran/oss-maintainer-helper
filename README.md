@@ -20,6 +20,8 @@ A fully open-source, agentic RAG app to explore and query GitHub projects using 
 ```bash
 pnpm install
 docker-compose up --build
+```
+
 Then visit:
 
 http://localhost:3000 — Frontend

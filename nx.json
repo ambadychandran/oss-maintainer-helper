@@ -45,11 +45,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": [
-        "apps/gateway-e2e/**/*",
-        "apps/gateway-e2e/**/*",
-        "apps/gateway-e2e/**/*"
-      ]
+      "exclude": ["apps/gateway-e2e/**/*"]
     },
     {
       "plugin": "@nx/eslint/plugin",

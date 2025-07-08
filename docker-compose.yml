@@ -2,13 +2,21 @@ version: "3.9"
 
 services:
   frontend:
-    build: ./apps/frontend
+    image: node:20
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: sh -c "corepack enable && pnpm install && pnpm nx run frontend:dev --port=3000 --hostname=0.0.0.0"
     ports:
       - "3000:3000"
     env_file: .env
 
   gateway:
-    build: ./apps/gateway
+    image: node:20
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: sh -c "corepack enable && pnpm install && PORT=4000 pnpm nx run gateway:serve"
     ports:
       - "4000:4000"
     env_file: .env
