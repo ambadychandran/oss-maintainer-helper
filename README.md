@@ -12,13 +12,14 @@ A fully open-source, agentic RAG app for GitHub maintainers** that uses **LangGr
 7. [Troubleshooting](#-troubleshooting)  
 8. [Contributing](#-contributing)  
 
-## ✅ Features
-
-✔ Fetches and indexes GitHub repo READMEs  
-✔ Summarises repository details using LLM (LangGraph)  
-✔ Logs metadata into Postgres  
-✔ Caches responses with Redis  
-✔ Simple Next.js frontend for maintainers  
+## 🚀 Features
+- **GitHub Integration**: Fetch README, open issues, and PRs
+- **RAG (Retrieval-Augmented Generation)**: Summarises repo context using **LangChain** & **LangGraph**
+- **Vector Database**: Uses **Chroma** for semantic search & indexing
+- **Caching Layer**: **Redis** to speed up repeated queries
+- **Data Persistence**: PostgreSQL for storing metadata
+- **Web Gateway**: Exposes APIs for frontend and external integrations
+- **Next.js Frontend**: User-friendly dashboard
 
 ## 🏗 Tech Stack
 
@@ -54,7 +55,7 @@ docker compose up --build
 |--------------|--------------------|-----------------------------------------|
 | **Frontend** | [http://localhost:3000](http://localhost:3000) | Next.js UI                               |
 | **Gateway**  | [http://localhost:4000/api](http://localhost:4000/api) | REST API gateway                         |
-| **Agent**    | [http://localhost:8001](http://localhost:8001) | LangGraph-powered AI agent               |
+| **Agent**    | [http://localhost:8001](http://localhost:8001) | AI Agent powered by **LangChain** & **LangGraph**                |
 | **Chroma**   | [http://localhost:8000](http://localhost:8000) | Vector database                          |
 | **Postgres** | `localhost:5432`   | Database                                 |
 | **Redis**    | `localhost:6379`   | Cache store                              |
