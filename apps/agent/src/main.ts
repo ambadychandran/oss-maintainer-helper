@@ -1,5 +1,11 @@
 import express from 'express';
 import { StateGraph, START, END, Annotation } from '@langchain/langgraph';
+import { GitHubRetriever } from './github/githubRetriever';
+
+const githubRetriever = new GitHubRetriever(
+  process.env.GITHUB_TOKEN,
+  process.env.REDIS_URL
+);
 
 //Define the state schema using Annotation.Root
 const GraphStateAnnotation = Annotation.Root({
@@ -16,11 +22,21 @@ const GraphStateAnnotation = Annotation.Root({
 export type GraphState = typeof GraphStateAnnotation.State;
 
 async function retrieverNode(state: GraphState) {
-  // TODO: fetch README from GitHub and index it in Chroma
-  return {
-    steps: ['retrieving'],
-    retrievedContent: 'README content',
-  };
+  try {
+    const content = await githubRetriever.getReadme(state.repo);
+    return {
+      steps: ['retrieving'],
+      retrievedContent: content,
+    };
+  } catch (err) {
+    console.error(
+      `Failed to retrieve README for ${state.repo}: ${(err as Error).message}`
+    );
+    return {
+      steps: ['retrieving'],
+      retrievedContent: '',
+    };
+  }
 }
 
 async function plannerNode(state: GraphState) {
@@ -74,7 +90,11 @@ app.post('/query', async (req, res): Promise<void> => {
   }
 
   const result = await agentGraph.invoke({ question, repo, steps: [] });
-  res.json({ answer: result.answer, steps: result.steps });
+  res.json({
+    answer: result.answer,
+    steps: result.steps,
+    retrievedContent: result.retrievedContent,
+  });
 });
 
 const port = process.env.PORT || 8001;
