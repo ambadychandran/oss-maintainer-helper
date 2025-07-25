@@ -1,6 +1,6 @@
 # OSS Maintainer Helper
 
-A fully open-source, agentic RAG app for GitHub maintainers** that uses **LangGraph**, **Chroma**, **PostgreSQL**, and **Redis** to help fetch, summarise, and analyse repository data.
+A fully open-source, agentic RAG app for GitHub maintainers that uses **LangGraph**, **LangChain**, **Chroma**, **PostgreSQL**, and **Redis** to help fetch, summarise, and analyse repository data.
 
 
 ## 📌 Table of Contents
@@ -20,11 +20,11 @@ A fully open-source, agentic RAG app for GitHub maintainers** that uses **LangGr
 
 ## 📌 Summary
 
-OSS Maintainer Helper (aka **OpenAgent**) is a fully open-source, agentic RAG application that allows developers to interact with and analyse GitHub repositories using **LLMs**, **retrieval**, and **tool integrations**.
+OSS Maintainer Helper is a fully open-source, agentic RAG application that allows developers to interact with and analyse GitHub repositories using **LLMs**, **retrieval**, and **tool integrations**.
 
 This app runs entirely locally using **Docker** and includes a monorepo setup powered by **Nx**, allowing seamless coordination of:
 
-- **Frontend**: Next.js (Radix UI + shadcn/ui)  
+- **Frontend**: Next.js 
 - **Backend**: Express.js (API Gateway)  
 - **Agent Backend**: FastAPI + LangGraph + LangChain
 
@@ -76,11 +76,10 @@ It provides **efficient build management**, **RAG-based summarisation**, and  **
 ```
 oss-maintainer-helper/
 ├── apps/
-│   ├── frontend/        # Next.js + shadcn/ui
+│   ├── frontend/        # Next.js 
 │   ├── gateway/         # Express.js (API Gateway)
-│   └── agent-backend/   # FastAPI + LangGraph + LangChain
+│   └── agent-backend/   # Express.js + LangGraph + LangChain
 ├── libs/                # Shared TS libraries or types
-├── tools/               # Nx custom executors (e.g., Python agents)
 ├── docker/              # Dockerfiles, Promtail config, etc.
 ├── .github/             # CI workflows
 ├── docker-compose.yml   # Service orchestration
@@ -103,7 +102,7 @@ oss-maintainer-helper/
 
 - **Docker & Docker Compose**  
 - **pnpm** (`corepack enable` or install manually)  
-- **4GB RAM minimum** (8GB recommended, especially on Raspberry Pi)
+- **4GB RAM minimum** (8GB recommended)
 
 ## 🚀 Getting Started (Docker)
 
@@ -211,7 +210,3 @@ pnpm nx dev @oss-maintainer-helper/frontend
 - **pnpm Download Issues** → `corepack prepare pnpm@latest --activate`
 - **Clean volumes** → `docker compose down -v && docker compose up --build`
 
-```bash
-pnpm lint
-pnpm test
-```
