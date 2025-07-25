@@ -1,18 +1,38 @@
 # OSS Maintainer Helper
 
 A fully open-source, agentic RAG app for GitHub maintainers** that uses **LangGraph**, **Chroma**, **PostgreSQL**, and **Redis** to help fetch, summarise, and analyse repository data.
+
+
 ## 📌 Table of Contents
 
-1. [Features](#-features)  
-2. [Tech Stack](#-tech-stack)  
-3. [Prerequisites](#-prerequisites)  
-4. [Getting Started (Docker)](#-getting-started-docker)  
-5. [Testing Each Service](#-testing-each-service)  
-6. [Local Development](#-local-development)  
-7. [Troubleshooting](#-troubleshooting)  
-8. [Contributing](#-contributing)  
+1. [Summary](#-summary)
+3. [Features](#-features)
+4. [High-Level Architecture](#-high-level-architecture)    
+5. [Tech Stack](#-tech-stack)  
+6. [Folder Structure](#-folder-structure)
+7. [Agent Nodes](#-agent-nodes)
+8. [Prerequisites](#-prerequisites)  
+9. [Getting Started (Docker)](#-getting-started-docker)  
+10. [Testing Each Service](#-testing-each-service)  
+11. [Local Development](#-local-development)  
+12. [Troubleshooting](#-troubleshooting)  
+
+
+## 📌 Summary
+
+OSS Maintainer Helper (aka **OpenAgent**) is a fully open-source, agentic RAG application that allows developers to interact with and analyse GitHub repositories using **LLMs**, **retrieval**, and **tool integrations**.
+
+This app runs entirely locally using **Docker** and includes a monorepo setup powered by **Nx**, allowing seamless coordination of:
+
+- **Frontend**: Next.js (Radix UI + shadcn/ui)  
+- **Backend**: Express.js (API Gateway)  
+- **Agent Backend**: FastAPI + LangGraph + LangChain
+
+It provides **efficient build management**, **RAG-based summarisation**, and  **MCP (Model Context Protocol)** tool integration for enhanced interoperability.
+
 
 ## 🚀 Features
+
 - **GitHub Integration**: Fetch README, open issues, and PRs
 - **RAG (Retrieval-Augmented Generation)**: Summarises repo context using **LangChain** & **LangGraph**
 - **Vector Database**: Uses **Chroma** for semantic search & indexing
@@ -21,17 +41,63 @@ A fully open-source, agentic RAG app for GitHub maintainers** that uses **LangGr
 - **Web Gateway**: Exposes APIs for frontend and external integrations
 - **Next.js Frontend**: User-friendly dashboard
 
-## 🏗 Tech Stack
 
-| Component        | Purpose                               |
-|-------------------|---------------------------------------|
-| **LangGraph**     | AI state machine for orchestrating tasks |
-| **Chroma**        | Vector database for embedding search   |
-| **PostgreSQL**    | Persistent metadata storage            |
-| **Redis**         | Cache for intermediate results         |
-| **Next.js**       | Frontend UI dashboard                  |
-| **Nx Monorepo**   | Project management & task runner       |
-| **Docker Compose**| Multi-service orchestration            |
+## 🧠 High-Level Architecture
+
+```
+[Next.js Frontend (Radix UI + shadcn/ui)]
+        ↓ REST
+[Express Gateway (Node.js, Nx-managed)]
+        ↓ HTTP
+[FastAPI (LangGraph + LangChain, MCP Tools)]
+        ↓
+[Vector DB (Chroma)] ←→ [PostgreSQL] ←→ [Redis Cache]
+        ↓
+[Ollama LLM runtime / OpenAI API]
+```
+
+## 🔧 Tech Stack
+
+| Component         | Purpose                                      |
+|--------------------|----------------------------------------------|
+| **LangGraph**      | AI state machine for orchestrating tasks     |
+| **LangChain**      | LLM abstraction, RAG, and prompt orchestration|
+| **MCP Protocol**   | Tool schema interoperability       |
+| **Chroma**         | Vector database for embedding search         |
+| **PostgreSQL**     | Persistent metadata storage                  |
+| **Redis**          | Cache for intermediate results               |
+| **Next.js**        | Frontend UI dashboard                        |
+| **Nx Monorepo**    | Project management & task runner             |
+| **Docker Compose** | Multi-service orchestration                  |
+
+
+## 📁 Folder Structure
+
+```
+oss-maintainer-helper/
+├── apps/
+│   ├── frontend/        # Next.js + shadcn/ui
+│   ├── gateway/         # Express.js (API Gateway)
+│   └── agent-backend/   # FastAPI + LangGraph + LangChain
+├── libs/                # Shared TS libraries or types
+├── tools/               # Nx custom executors (e.g., Python agents)
+├── docker/              # Dockerfiles, Promtail config, etc.
+├── .github/             # CI workflows
+├── docker-compose.yml   # Service orchestration
+├── nx.json              # Nx configuration
+├── workspace.json       # Nx workspace projects
+├── package.json         # JS dependencies
+├── requirements.txt     # Python dependencies
+├── .env.example         # Sample environment variables
+└── README.md
+```
+
+## ⚙️ Agent Nodes
+
+- **retriever_node**: Queries vector DB (issues, PRs, README, etc.)  
+- **planner_node**: Classifies query intent  
+- **summariser_node**: Uses LLM with RAG context  
+- **logger_node**: Logs metadata to PostgreSQL  
 
 ## 🔧 Prerequisites
 
@@ -68,7 +134,7 @@ docker compose down -v
 
 ## 🧪 Testing Each Service
 
-### ✅ 1. Agent (LangGraph)
+### ✅ 1. Agent
 
 Check health:
 
@@ -145,21 +211,7 @@ pnpm nx dev @oss-maintainer-helper/frontend
 - **pnpm Download Issues** → `corepack prepare pnpm@latest --activate`
 - **Clean volumes** → `docker compose down -v && docker compose up --build`
 
-## 🤝 Contributing
-
-1. Fork & create a feature branch  
-2. Run lint & tests before committing:
-
 ```bash
 pnpm lint
 pnpm test
 ```
-
-3. Submit a PR
-
-## 📌 Roadmap
-
-- ✅ GitHub Issues & PRs Retriever  
-- ✅ RAG-based summaries  
-- ⬜ AI-based PR review suggestions  
-- ⬜ Multi-repo maintenance dashboard
