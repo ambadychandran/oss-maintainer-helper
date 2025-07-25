@@ -26,7 +26,7 @@ This app runs entirely locally using **Docker** and includes a monorepo setup po
 
 - **Frontend**: Next.js 
 - **Backend**: Express.js (API Gateway)  
-- **Agent Backend**: FastAPI + LangGraph + LangChain
+- **Agent Backend**: Express.js + LangGraph.js + LangChain.js
 
 It provides **efficient build management**, **RAG-based summarisation**, and  **MCP (Model Context Protocol)** tool integration for enhanced interoperability.
 
