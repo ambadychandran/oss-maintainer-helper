@@ -37,7 +37,10 @@ export class GitHubRetriever {
     throw error instanceof Error ? error : new Error('Unknown error');
   }
 
-  private async fetchWithCache<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  private async fetchWithCache<T>(
+    key: string,
+    fetcher: () => Promise<T>
+  ): Promise<T> {
     if (this.redis) {
       const cached = await this.redis.get(key);
       if (cached) {
@@ -59,6 +62,21 @@ export class GitHubRetriever {
   async getReadme(repoFullName: string): Promise<string> {
     const key = `readme:${repoFullName}`;
     const content = await this.fetchWithCache(key, async () => {
+      try {
+        const mcpEntries = await this.getMCPContext(repoFullName);
+        const readmeEntry = mcpEntries.find((e: any) => e.type === 'readme');
+        if (readmeEntry) {
+          const body = (readmeEntry.content || readmeEntry.body) as
+            | string
+            | undefined;
+          if (body) {
+            return body;
+          }
+        }
+      } catch (err) {
+        console.error(`MCP retrieval failed: ${(err as Error).message}`);
+      }
+
       const res = await this.axios.get(`/repos/${repoFullName}/readme`);
       return Buffer.from(res.data.content, 'base64').toString('utf-8');
     });
@@ -85,5 +103,47 @@ export class GitHubRetriever {
       return res.data as object[];
     });
     return pulls;
+  }
+
+  async getMCPContext(repoFullName: string): Promise<object[]> {
+    const key = `mcp:${repoFullName}`;
+
+    if (this.redis) {
+      const cached = await this.redis.get(key);
+      if (cached) {
+        return JSON.parse(cached) as object[];
+      }
+    }
+
+    try {
+      const res = await axios.get(
+        `https://context.github.com/github/${repoFullName}`
+      );
+      const entries = Array.isArray(res.data)
+        ? res.data
+        : (res.data?.entries as object[] | undefined);
+      const result = Array.isArray(entries) ? entries : [];
+
+      if (this.redis) {
+        await this.redis.set(key, JSON.stringify(result), 'EX', 3600);
+      }
+
+      return result;
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        if (this.redis) {
+          await this.redis.set(key, JSON.stringify([]), 'EX', 3600);
+        }
+        return [];
+      }
+
+      const message =
+        axios.isAxiosError(err) && err.response
+          ? `MCP API Error: ${err.response.status}`
+          : err instanceof Error
+          ? err.message
+          : 'Unknown error';
+      throw new Error(`Failed to fetch MCP context: ${message}`);
+    }
   }
 }
