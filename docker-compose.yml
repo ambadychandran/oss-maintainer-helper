@@ -6,6 +6,8 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace
+    environment:
+      NX_NON_INTERACTIVE: "true"  
     command: sh -c "corepack enable && pnpm install && pnpm nx run frontend:dev --port=3000 --hostname=0.0.0.0"
     ports:
       - "3000:3000"
@@ -26,6 +28,8 @@ services:
     working_dir: /workspace
     volumes:
       - .:/workspace
+    environment:
+      NX_NON_INTERACTIVE: "true"    
     command: sh -c "corepack enable && pnpm install && PORT=8001 pnpm nx run agent:serve"
     ports:
       - "8001:8001"
@@ -51,6 +55,7 @@ services:
       - "8000:8000"
 
   ollama:
-    image: ollama/ollama
-    ports:
-      - "11434:11434"
+    profiles: ["manual"]
+    # image: ollama/ollama
+    # ports:
+    #   - "11434:11434"

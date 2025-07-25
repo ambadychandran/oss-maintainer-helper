@@ -1,52 +1,61 @@
 import express from 'express';
-import { StateGraph, END } from '@langchain/langgraph';
+import { StateGraph, START, END, Annotation } from '@langchain/langgraph';
 
-export interface GraphState {
-  question?: string;
-  repo?: string;
-  steps?: string[];
-  answer?: string;
-  retrievedContent?: string;
-}
+//Define the state schema using Annotation.Root
+const GraphStateAnnotation = Annotation.Root({
+  question: Annotation<string>(),
+  repo: Annotation<string>(),
+  steps: Annotation<string[]>({
+    reducer: (left, right) => [...(left ?? []), ...(right ?? [])],
+    default: () => [],
+  }),
+  answer: Annotation<string>(),
+  retrievedContent: Annotation<string>(),
+});
 
-async function retrieverNode(state: GraphState): Promise<GraphState> {
-  const steps = [...(state.steps ?? []), 'retrieving'];
+export type GraphState = typeof GraphStateAnnotation.State;
+
+async function retrieverNode(state: GraphState) {
   // TODO: fetch README from GitHub and index it in Chroma
-  return { ...state, steps, retrievedContent: 'README content' };
+  return {
+    steps: ['retrieving'],
+    retrievedContent: 'README content',
+  };
 }
 
-async function plannerNode(state: GraphState): Promise<GraphState> {
-  const steps = [...(state.steps ?? []), 'planning'];
+async function plannerNode(state: GraphState) {
   // TODO: classify intent
-  return { ...state, steps };
+  return {
+    steps: ['planning'],
+  };
 }
 
-async function summariserNode(state: GraphState): Promise<GraphState> {
-  const steps = [...(state.steps ?? []), 'summarising'];
+async function summariserNode(state: GraphState) {
   // TODO: build prompt and call LLM via LangChain.js
-  return { ...state, steps, answer: `Summary for ${state.question}` };
+  return {
+    steps: ['summarising'],
+    answer: `Summary for ${state.question}`,
+  };
 }
 
-async function loggerNode(state: GraphState): Promise<GraphState> {
-  const steps = [...(state.steps ?? []), 'logging'];
+async function loggerNode(state: GraphState) {
   // TODO: persist metadata to PostgreSQL
-  return { ...state, steps };
+  return {
+    steps: ['logging'],
+  };
 }
 
-const graph = new StateGraph<GraphState>();
-
-graph.addNode('retriever_node', retrieverNode);
-graph.addNode('planner_node', plannerNode);
-graph.addNode('summariser_node', summariserNode);
-graph.addNode('logger_node', loggerNode);
-
-graph.addEdge('retriever_node', 'planner_node');
-graph.addEdge('planner_node', 'summariser_node');
-graph.addEdge('summariser_node', 'logger_node');
-graph.addEdge('logger_node', END);
-
-graph.setEntryPoint('retriever_node');
-graph.setFinishPoint('logger_node');
+//Build graph with Annotation.Root
+const graph = new StateGraph(GraphStateAnnotation)
+  .addNode('retriever_node', retrieverNode)
+  .addNode('planner_node', plannerNode)
+  .addNode('summariser_node', summariserNode)
+  .addNode('logger_node', loggerNode)
+  .addEdge(START, 'retriever_node')
+  .addEdge('retriever_node', 'planner_node')
+  .addEdge('planner_node', 'summariser_node')
+  .addEdge('summariser_node', 'logger_node')
+  .addEdge('logger_node', END);
 
 const agentGraph = graph.compile();
 
@@ -57,11 +66,13 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.post('/query', async (req, res) => {
-  const { question, repo } = req.body as GraphState;
+app.post('/query', async (req, res): Promise<void> => {
+  const { question, repo } = req.body;
   if (!question || !repo) {
-    return res.status(400).json({ message: 'question and repo required' });
+    res.status(400).json({ message: 'question and repo required' });
+    return;
   }
+
   const result = await agentGraph.invoke({ question, repo, steps: [] });
   res.json({ answer: result.answer, steps: result.steps });
 });
