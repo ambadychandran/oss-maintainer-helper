@@ -49,7 +49,7 @@ It provides **efficient build management**, **RAG-based summarisation**, and  **
         ↓ REST
 [Express Gateway (Node.js, Nx-managed)]
         ↓ HTTP
-[FastAPI (LangGraph + LangChain, MCP Tools)]
+[Agent Service (Node.js + LangGraph.js + LangChain.js)]
         ↓
 [Vector DB (Chroma)] ←→ [PostgreSQL] ←→ [Redis Cache]
         ↓
@@ -86,7 +86,6 @@ oss-maintainer-helper/
 ├── nx.json              # Nx configuration
 ├── workspace.json       # Nx workspace projects
 ├── package.json         # JS dependencies
-├── requirements.txt     # Python dependencies
 ├── .env.example         # Sample environment variables
 └── README.md
 ```
